@@ -1,0 +1,332 @@
+#include "lvgl_app.h"
+#include "llq_image.h"
+#include "stdio.h"
+#include "flash_task.h"
+
+lvgl_app_info lvgl_task_app_t;
+extern char pass_name_lv[MAX_PASS_NUM*MAX_PASS_NAME_LEN];
+
+static void roller_event_handler(lv_event_t * e);
+static void lv_app_win_selected(lvgl_app_info *lvgl_app_t,uint8_t level_t);
+static void lv_gui_level1_ctr(lvgl_app_info *lvgl_app_t);
+static void lv_gui_passmenu(lvgl_app_info *lvgl_app_t);
+static void lv_gui_password(lvgl_app_info *lvgl_app_t);
+static void lv_password_save(lvgl_app_info *lvgl_app_t);
+
+char   input_name_str[128]="";
+char   input_word_str[128]="";
+char   password_num[128]="";
+static lv_img_dsc_t my_img_dsc =
+{
+    .header.always_zero = 0,
+    .header.w = LLQ_IMAG_WIDTH,
+    .header.h = LLQ_IMAGE_HIGH,
+    .data_size = LLQ_IMAG_WIDTH * LLQ_IMAGE_HIGH * LV_COLOR_DEPTH / 8,
+    .header.cf = LV_IMG_CF_TRUE_COLOR,          /*Set the color format*/
+    .data = gImage_llq,
+};
+
+void input_char_updata(char *char_t)
+{
+    switch(lvgl_task_app_t.widget2_1.password_input_select)
+        {
+        case NAME_INPUT:
+        {
+            //密码名称输入长度限制
+            if(strlen(input_name_str)<=MAX_PASS_NAME_LEN)
+                {
+                    strcat(input_name_str,char_t);
+                }
+        }
+        break;
+        case WORD_INPUT:
+        {
+            //密码输入长度限制
+            if(strlen(input_word_str)<=MAX_PASS_WORD_LEN)
+                {
+                    strcat(input_word_str,char_t);
+                }
+        }
+        break;
+        }
+    return;
+}
+void delete_one_char(void)
+{
+    uint8_t length = 0;
+    switch(lvgl_task_app_t.widget2_1.password_input_select)
+        {
+        case NAME_INPUT:
+        {
+            length =strlen(input_name_str);
+            if(length>0)
+                {
+                    input_name_str[length-1]='\0';
+                }
+        };
+        break;
+        case WORD_INPUT:
+        {
+            length =strlen(input_word_str);
+            if(length>0)
+                {
+                    input_word_str[length-1]='\0';
+                }
+        };
+        break;
+        }
+    return;
+
+}
+uint8_t get_input_start(void)
+{
+    return lvgl_task_app_t.widget2_1.pass_input;
+}
+static void password_input_ctr(void)
+{
+    uint8_t password_len;
+    //如果开启了输入功能
+    if(lvgl_task_app_t.widget2_1.pass_input==1)
+        {
+            //根据编码器值选择输入框选项
+            lvgl_task_app_t.widget2_1.password_input_select = lvgl_task_app_t.gui_key_ctr.cur_enc%2;
+            switch(lvgl_task_app_t.widget2_1.password_input_select)
+                {
+                case NAME_INPUT:
+                {
+                    lv_label_set_text_fmt(lvgl_task_app_t.widget2_1.set_num,"#359bff current num:# #ff0000 [%d]#",lvgl_task_app_t.gui_key_ctr.password_level);
+                    lv_label_set_text_fmt(lvgl_task_app_t.widget2_1.name_label,"#ff0000 name#");
+                    lv_label_set_text_fmt(lvgl_task_app_t.widget2_1.password_label,"password");
+                    lv_textarea_set_text(lvgl_task_app_t.widget2_1.name,input_name_str);
+                }
+                break;
+                case WORD_INPUT:
+                {
+                    lv_label_set_text_fmt(lvgl_task_app_t.widget2_1.set_num,"#359bff current num:# #ff0000 [%d]#",lvgl_task_app_t.gui_key_ctr.password_level);
+                    lv_label_set_text_fmt(lvgl_task_app_t.widget2_1.name_label,"name");
+                    lv_label_set_text_fmt(lvgl_task_app_t.widget2_1.password_label,"#ff0000 password#");
+                    password_len = strlen(input_word_str);
+                    memset(password_num,'*',password_len);
+                    password_num[password_len] = '\0';
+                    lv_textarea_set_text(lvgl_task_app_t.widget2_1.password,password_num);
+                }
+                break;
+                }
+        }
+}
+
+void lvgl_app_init(lvgl_app_info *lvgl_app_t)
+{
+    //主界面
+    lvgl_app_t->main_win.app_obj_main  = lv_obj_create(NULL);
+    lv_obj_set_size(lvgl_app_t->main_win.app_obj_main,LV_HOR_RES,LV_VER_RES);
+    lv_obj_set_style_bg_color(lvgl_app_t->main_win.app_obj_main,lv_color_black(),0);
+    lv_obj_set_style_bg_opa(lvgl_app_t->main_win.app_obj_main,LV_STATE_DEFAULT,LV_OPA_100);
+    lv_obj_set_pos(lvgl_app_t->main_win.app_obj_main,0,0);
+
+    lvgl_app_t->main_win.label_battery = lv_label_create(lvgl_app_t->main_win.app_obj_main);
+    lv_label_set_recolor(lvgl_app_t->main_win.label_battery,true);
+    lv_label_set_text_fmt(lvgl_app_t->main_win.label_battery,"#359bff %d%%" LV_SYMBOL_BATTERY_EMPTY,99);
+    lv_obj_align(lvgl_app_t->main_win.label_battery,LV_ALIGN_TOP_RIGHT,-5,0);
+
+    lvgl_app_t->main_win.label_bluetooth = lv_label_create(lvgl_app_t->main_win.app_obj_main);
+    lv_label_set_recolor(lvgl_app_t->main_win.label_bluetooth,true);
+    lv_label_set_text_fmt(lvgl_app_t->main_win.label_bluetooth,"#359bff " LV_SYMBOL_BLUETOOTH);
+    lv_obj_align(lvgl_app_t->main_win.label_bluetooth,LV_ALIGN_TOP_RIGHT,-60,0);
+
+    lvgl_app_t->main_win.label_wifi = lv_label_create(lvgl_app_t->main_win.app_obj_main);
+    lv_label_set_recolor(lvgl_app_t->main_win.label_wifi,true);
+    lv_label_set_text_fmt(lvgl_app_t->main_win.label_wifi,"#359bff " LV_SYMBOL_WIFI);
+    lv_obj_align(lvgl_app_t->main_win.label_wifi,LV_ALIGN_TOP_RIGHT,-75,0);
+
+    lvgl_app_t->main_win.icon = lv_img_create(lvgl_app_t->main_win.app_obj_main);
+    lv_img_set_src(lvgl_app_t->main_win.icon,&my_img_dsc);
+    lv_obj_align(lvgl_app_t->main_win.icon,LV_ALIGN_CENTER,0,0);
+
+    /*子界面*/
+    lvgl_app_t->widget1.app_obj_widget  = lv_obj_create(NULL);
+    lv_obj_set_size(lvgl_app_t->widget1.app_obj_widget,LV_HOR_RES,LV_VER_RES);
+    lv_obj_set_style_bg_color(lvgl_app_t->widget1.app_obj_widget,lv_color_black(),0);
+    lv_obj_set_style_bg_opa(lvgl_app_t->widget1.app_obj_widget,LV_STATE_DEFAULT,LV_OPA_100);
+    lv_obj_set_pos(lvgl_app_t->widget1.app_obj_widget,0,0);
+
+    /*添加滚筒*/
+    lvgl_app_t->widget1.roller_t = lv_roller_create(lvgl_app_t->widget1.app_obj_widget);
+    lv_roller_set_visible_row_count(lvgl_app_t->widget1.roller_t,4);
+    lv_obj_set_size(lvgl_app_t->widget1.roller_t,LV_HOR_RES,LV_VER_RES);
+    lv_obj_set_style_text_align(lvgl_app_t->widget1.roller_t, LV_TEXT_ALIGN_LEFT, 0);
+    lv_obj_align(lvgl_app_t->widget1.roller_t,LV_ALIGN_CENTER, 0,0);
+
+
+    /*子界面*/
+    lvgl_app_t->widget2_1.lv_obj_set  = lv_obj_create(NULL);
+    lv_obj_set_size(lvgl_app_t->widget2_1.lv_obj_set,LV_HOR_RES,LV_VER_RES);
+    lv_obj_set_style_bg_opa(lvgl_app_t->widget2_1.lv_obj_set,LV_STATE_DEFAULT,LV_OPA_100);
+    lv_obj_set_pos(lvgl_app_t->widget2_1.lv_obj_set,0,0);
+
+    lvgl_app_t->widget2_1.set_num = lv_label_create(lvgl_app_t->widget2_1.lv_obj_set);
+    lv_label_set_recolor(lvgl_app_t->widget2_1.set_num, true);
+    lv_label_set_long_mode(lvgl_app_t->widget2_1.set_num, LV_LABEL_LONG_SCROLL_CIRCULAR);/*Circular scroll*/
+    lv_obj_set_width(lvgl_app_t->widget2_1.set_num, 120);
+    lv_label_set_text_fmt(lvgl_app_t->widget2_1.set_num,"#359bff current num:# #ff0000 [%d]#",lvgl_app_t->gui_key_ctr.password_level);
+    lv_obj_align(lvgl_app_t->widget2_1.set_num,LV_ALIGN_TOP_LEFT,90,10);
+
+    lvgl_app_t->widget2_1.name_label = lv_label_create(lvgl_app_t->widget2_1.lv_obj_set);
+    lv_label_set_recolor(lvgl_app_t->widget2_1.name_label, true);
+    lv_label_set_long_mode(lvgl_app_t->widget2_1.name_label, LV_LABEL_LONG_SCROLL_CIRCULAR);/*Circular scroll*/
+    lv_obj_set_width(lvgl_app_t->widget2_1.name_label, 100);
+    lv_label_set_text_fmt(lvgl_app_t->widget2_1.name_label,"#359bff name#");
+    lv_obj_align(lvgl_app_t->widget2_1.name_label,LV_ALIGN_TOP_LEFT,5,10);
+
+    lvgl_app_t->widget2_1.name = lv_textarea_create(lvgl_app_t->widget2_1.lv_obj_set);
+    lv_textarea_set_placeholder_text(lvgl_app_t->widget2_1.name, "name");
+    lv_obj_set_size(lvgl_app_t->widget2_1.name,200,40);
+    lv_obj_align(lvgl_app_t->widget2_1.name, LV_ALIGN_TOP_LEFT,20,25);
+
+    lvgl_app_t->widget2_1.password_label = lv_label_create(lvgl_app_t->widget2_1.lv_obj_set);
+    lv_label_set_recolor(lvgl_app_t->widget2_1.password_label, true);
+    lv_label_set_long_mode(lvgl_app_t->widget2_1.password_label, LV_LABEL_LONG_SCROLL_CIRCULAR);/*Circular scroll*/
+    lv_obj_set_width(lvgl_app_t->widget2_1.password_label, 100);
+    lv_label_set_text_fmt(lvgl_app_t->widget2_1.password_label,"#359bff password#");
+    lv_obj_align(lvgl_app_t->widget2_1.password_label,LV_ALIGN_TOP_LEFT,5,65);
+
+    lvgl_app_t->widget2_1.password = lv_textarea_create(lvgl_app_t->widget2_1.lv_obj_set);
+    lv_textarea_set_placeholder_text(lvgl_app_t->widget2_1.password, "password");
+    lv_obj_set_size(lvgl_app_t->widget2_1.password,200,40);
+    lv_obj_align(lvgl_app_t->widget2_1.password,LV_ALIGN_TOP_LEFT,20,80);
+    lv_scr_load(lvgl_app_t->main_win.app_obj_main);
+}
+
+//界面切换控制
+void lv_app_run(lvgl_app_info *lvgl_app_t)
+{
+    lvgl_task_app_t.widget2_1.pass_input = 0;
+    //如果GUI按键触发事件为返回主界面
+    if(lvgl_app_t->gui_key_ctr.cur_key_t == GUI_RETURN_MAIN)
+        {
+            lv_app_win_selected(lvgl_app_t,0);
+            lvgl_app_t->gui_key_ctr.cur_key_t = GUI_NULL;
+            return;
+        }
+    lv_gui_level1_ctr(lvgl_app_t);
+}
+static void lv_gui_level1_ctr(lvgl_app_info *lvgl_app_t)
+{
+    //如果GUI按键触发事件为进入
+    switch(lvgl_app_t->gui_key_ctr.level1)
+        {
+        case GUI_MAIN:
+        {
+            if(lvgl_app_t->gui_key_ctr.cur_key_t == GUI_ENTER)
+                {
+                    lv_app_win_selected(lvgl_app_t,GUI_PASSMENU);
+                    lv_roller_set_options(lvgl_app_t->widget1.roller_t,
+                                          pass_name_lv,
+                                          LV_ROLLER_MODE_INFINITE);
+                    lvgl_app_t->gui_key_ctr.cur_key_t = GUI_NULL;
+                    return;
+                }
+        };
+        break;
+        case GUI_PASSMENU:
+        {
+            lv_gui_passmenu(lvgl_app_t);
+        };
+        break;
+        case GUI_PASSWORD:
+        {
+            lv_gui_password(lvgl_app_t);
+        };
+        break;
+        }
+    return;
+}
+//密码选择界面
+static void lv_gui_passmenu(lvgl_app_info *lvgl_app_t)
+{
+    uint8_t password_len;
+    //更新选择
+    if(lvgl_app_t->gui_key_ctr.cur_enc != lvgl_app_t->gui_key_ctr.last_enc)
+        {
+            lv_roller_set_selected(lvgl_app_t->widget1.roller_t,
+                                   lvgl_app_t->gui_key_ctr.cur_enc,
+                                   LV_ANIM_OFF);
+            lvgl_app_t->gui_key_ctr.password_level = lv_roller_get_selected(lvgl_app_t->widget1.roller_t);
+            lvgl_app_t->gui_key_ctr.last_enc = lvgl_app_t->gui_key_ctr.cur_enc;
+        }
+    //按下按键返回上一级菜单
+    if(lvgl_app_t->gui_key_ctr.cur_key_t == GUI_BACK)
+        {
+            lv_app_win_selected(lvgl_app_t,GUI_MAIN);
+            lvgl_app_t->gui_key_ctr.cur_key_t = GUI_NULL;
+        }
+    else if(lvgl_app_t->gui_key_ctr.cur_key_t == GUI_ENTER)
+        {
+
+            lv_app_win_selected(lvgl_app_t,GUI_PASSWORD);
+            memset(input_name_str,0,sizeof(input_name_str));
+            memset(input_word_str,0,sizeof(input_word_str));
+            //获取对应密码
+            get_password_info(input_name_str,input_word_str,lvgl_app_t->gui_key_ctr.password_level);
+            //加载一次密码显示
+            lv_textarea_set_text(lvgl_task_app_t.widget2_1.name,input_name_str);
+            password_len = strlen(input_word_str);
+            memset(password_num,'*',password_len);
+            password_num[password_len] = '\0';
+            lv_textarea_set_text(lvgl_task_app_t.widget2_1.password,password_num);
+            lvgl_app_t->gui_key_ctr.cur_key_t = GUI_NULL;
+        }
+}
+
+//密码设置界面功能管理
+static void lv_gui_password(lvgl_app_info *lvgl_app_t)
+{
+    //GUI界面循环，启动输入功能
+    lvgl_app_t->widget2_1.pass_input = 1;
+    //GUI界面输入控制
+    password_input_ctr();
+    //GUI按键事件
+    if(lvgl_app_t->gui_key_ctr.cur_key_t == GUI_BACK)
+        {
+            lv_app_win_selected(lvgl_app_t,GUI_PASSMENU);
+            lvgl_app_t->gui_key_ctr.cur_key_t = GUI_NULL;
+        }
+    else if(lvgl_app_t->gui_key_ctr.cur_key_t == GUI_ENTER)
+        {
+            //按下确认保存密码，保存成功返回上级菜单
+            lv_password_save(lvgl_app_t);
+            lvgl_app_t->gui_key_ctr.cur_key_t = GUI_NULL;
+        }
+}
+static void lv_password_save(lvgl_app_info *lvgl_app_t)
+{
+    updata_password_edit(input_name_str,input_word_str,lvgl_app_t->gui_key_ctr.password_level);
+    lv_roller_set_options(lvgl_app_t->widget1.roller_t,
+                          pass_name_lv,
+                          LV_ROLLER_MODE_INFINITE);
+}
+static void lv_app_win_selected(lvgl_app_info *lvgl_app_t,uint8_t level_t)
+{
+    lvgl_app_t->gui_key_ctr.level1 = level_t;
+    switch(lvgl_app_t->gui_key_ctr.level1)
+        {
+        case GUI_MAIN:
+        {
+//            lv_scr_load(lvgl_app_t->main_win.app_obj_main);
+          lv_scr_load_anim(lvgl_app_t->main_win.app_obj_main,LV_SCR_LOAD_ANIM_FADE_ON,500, 50, false);
+        }
+        break;
+        case GUI_PASSMENU:
+        {
+//            lv_scr_load(lvgl_app_t->widget1.app_obj_widget);
+          lv_scr_load_anim(lvgl_app_t->widget1.app_obj_widget,LV_SCR_LOAD_ANIM_FADE_ON,500, 50, false);
+        }
+        break;
+        case GUI_PASSWORD:
+        {
+            lv_scr_load(lvgl_app_t->widget2_1.lv_obj_set);
+        }
+        break;
+        }
+}
+

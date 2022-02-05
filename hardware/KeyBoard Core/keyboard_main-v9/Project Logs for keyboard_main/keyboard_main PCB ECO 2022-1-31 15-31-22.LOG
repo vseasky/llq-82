@@ -1,0 +1,52 @@
+Added Component: Designator=C13(C 0402_L)
+Added Component: Designator=C14(C 0402_L)
+Added Component: Designator=C15(C 0402_L)
+Added Component: Designator=C16(C 0402_L)
+Added Component: Designator=U2(SOT23-5M)
+Added Pin To Net: NetName=VCC_BUS Pin=C13-1
+Added Pin To Net: NetName=GND Pin=C13-2
+Added Pin To Net: NetName=VCC_BUS Pin=C14-1
+Added Pin To Net: NetName=GND Pin=C14-2
+Added Pin To Net: NetName=VCC_BLE Pin=C15-1
+Added Pin To Net: NetName=GND Pin=C15-2
+Added Pin To Net: NetName=VCC_BLE Pin=C16-1
+Added Pin To Net: NetName=GND Pin=C16-2
+Added Pin To Net: NetName=VCC_BUS Pin=U2-1
+Added Pin To Net: NetName=GND Pin=U2-2
+Added Pin To Net: NetName=ESP32_EN Pin=U2-3
+Added Pin To Net: NetName=VCC_BLE Pin=U2-5
+Added Member To Class: ClassName=keyboard_main Member=Component C13 4.7uF
+Added Member To Class: ClassName=keyboard_main Member=Component C14 0.1uF
+Added Member To Class: ClassName=keyboard_main Member=Component C15 4.7uF
+Added Member To Class: ClassName=keyboard_main Member=Component C16 0.1uF
+Added Member To Class: ClassName=keyboard_main Member=Component C17 2.2uF
+Added Member To Class: ClassName=keyboard_main Member=Component C19 330pF
+Added Member To Class: ClassName=keyboard_main Member=Component C21 330pF
+Added Member To Class: ClassName=keyboard_main Member=Component C22 4.7uF
+Added Member To Class: ClassName=keyboard_main Member=Component C24 4.7uF
+Added Member To Class: ClassName=keyboard_main Member=Component C25 0.1uF
+Added Member To Class: ClassName=keyboard_main Member=Component C26 4.7uF
+Added Member To Class: ClassName=keyboard_main Member=Component C27 0.1uF
+Added Member To Class: ClassName=keyboard_main Member=Component C28 22uF
+Added Member To Class: ClassName=keyboard_main Member=Component C30 22uF
+Added Member To Class: ClassName=keyboard_main Member=Component C32 0.1uF
+Added Member To Class: ClassName=keyboard_main Member=Component C35 22uF
+Added Member To Class: ClassName=keyboard_main Member=Component C36 22uF
+Added Member To Class: ClassName=keyboard_main Member=Component C37 0.1uF
+Added Member To Class: ClassName=keyboard_main Member=Component C38 22uF
+Added Member To Class: ClassName=keyboard_main Member=Component C39 22uF
+Added Member To Class: ClassName=keyboard_main Member=Component C40 0.1uF
+Added Member To Class: ClassName=keyboard_main Member=Component C41 22uF
+Added Member To Class: ClassName=keyboard_main Member=Component C42 4.7uF
+Added Member To Class: ClassName=keyboard_main Member=Component C43 0.1uF
+Added Member To Class: ClassName=keyboard_main Member=Component C49 1uF
+Added Member To Class: ClassName=keyboard_main Member=Component C50 4.7uF
+Added Member To Class: ClassName=keyboard_main Member=Component R30 0R
+Added Member To Class: ClassName=keyboard_main Member=Component R32 1K
+Added Member To Class: ClassName=keyboard_main Member=Component R33 0R
+Added Member To Class: ClassName=keyboard_main Member=Component R36 0R
+Added Member To Class: ClassName=keyboard_main Member=Component U2 RT9013-33GB
+Added Member To Class: ClassName=keyboard_main Member=Component U3 RT9013-33GB
+Added Member To Class: ClassName=keyboard_main Member=Component U5 SW6208
+Added Member To Class: ClassName=keyboard_main Member=Component U6 UT8205A
+Added Member To Class: ClassName=keyboard_main Member=Component U8 UT8205A

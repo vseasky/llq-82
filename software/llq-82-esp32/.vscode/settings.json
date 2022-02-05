@@ -1,0 +1,22 @@
+{
+  "C_Cpp.intelliSenseEngine": "Tag Parser",
+  "files.associations": {
+    "bsp_uart.h": "c",
+    "random": "c",
+    "rtc_wdt.h": "c",
+    "soc.h": "c",
+    "esp_task_wdt.h": "c",
+    "esp_system.h": "c",
+    "esp_log.h": "c",
+    "format": "c",
+    "queue": "c",
+    "regex": "c",
+    "xlocale": "c",
+    "xstring": "c"
+  },
+  "idf.adapterTargetName": "esp32s3",
+  "idf.openOcdConfigs": [
+    "board/esp32s3-builtin.cfg"
+  ],
+  "idf.portWin": "COM5"
+}

@@ -1,0 +1,1 @@
+如果使用cube重新生成过，请用备份里的ST文件替换Middlewares目录下的ST文件

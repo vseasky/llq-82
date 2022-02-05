@@ -1,0 +1,83 @@
+#include "bsp_usart.h"
+
+#include "bsp_bm2166.h"
+
+uint8_t 	usart3_rx_buf[2][USART_RX_LEN];
+uint16_t 	usart3_rx_pos;
+extern  UART_HandleTypeDef huart3;
+extern DMA_HandleTypeDef hdma_usart3_rx;
+extern DMA_HandleTypeDef hdma_usart3_tx;
+void bsp_usart3_init(void)
+{
+    //使能DMA串口接收
+    SET_BIT(huart3.Instance->CR3, USART_CR3_DMAR);
+    __HAL_UART_ENABLE_IT(&huart3,UART_IT_IDLE);     //空闲中断使能
+//	__HAL_UART_ENABLE_IT(&huart3,UART_IT_RXNE); 	//接收中断使能
+    __HAL_UART_CLEAR_IDLEFLAG(&huart3);       		//清除串口空闲中断标志位
+    //失效DMA
+    __HAL_DMA_DISABLE(&hdma_usart3_rx);
+
+    while(hdma_usart3_rx.Instance->CR & DMA_SxCR_EN)
+        {
+            __HAL_DMA_DISABLE(&hdma_usart3_rx);
+        }
+    hdma_usart3_rx.Instance->PAR = (uint32_t) & (USART3->DR);
+    //内存缓冲区1
+    hdma_usart3_rx.Instance->M0AR = (uint32_t)(usart3_rx_buf[0]);
+    //内存缓冲区2
+    hdma_usart3_rx.Instance->M1AR = (uint32_t)(usart3_rx_buf[1]);
+    //数据长度
+    hdma_usart3_rx.Instance->NDTR = USART_RX_LEN;
+    //使能双缓冲区
+    SET_BIT(hdma_usart3_rx.Instance->CR,DMA_SxCR_DBM);
+    //使能DMA
+    __HAL_DMA_ENABLE(&hdma_usart3_rx);
+}
+
+void USER_UART_DMA_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    uint16_t rx_flag;
+    static uint16_t this_time_rx_len = 0;
+    if(huart->Instance == huart3.Instance)
+        {
+            //判断是否是空闲中断
+            if(huart3.Instance->SR & UART_FLAG_RXNE)//接收到数据
+                {
+                    __HAL_UART_CLEAR_PEFLAG(&huart3);
+                }
+            else if(RESET != __HAL_UART_GET_FLAG(&huart3, UART_FLAG_IDLE))
+                {
+                    __HAL_UART_CLEAR_IDLEFLAG(&huart3);//清楚空闲中断标志（否则会一直不断进入中断）
+                    if ((hdma_usart3_rx.Instance->CR & DMA_SxCR_CT) == RESET)
+                        {
+                            //失效DMA
+                            __HAL_DMA_DISABLE(&hdma_usart3_rx);
+                            //获取接收数据长度,长度 = 设定长度 - 剩余长度
+                            this_time_rx_len = USART_RX_LEN - hdma_usart3_rx.Instance->NDTR;
+                            //重新设定数据长度
+                            hdma_usart3_rx.Instance->NDTR = USART_RX_LEN;
+                            //设定缓冲区1
+                            hdma_usart3_rx.Instance->CR |= (uint32_t)(DMA_SxCR_CT);
+                            //使能DMA
+                            __HAL_DMA_ENABLE(&hdma_usart3_rx);
+                            /*计算缓冲区0*/
+							bsp_bm2166_receive(,this_time_rx_len);
+                        }
+                    else
+                        {
+                            //失效DMA
+                            __HAL_DMA_DISABLE(&hdma_usart3_rx);
+                            //获取接收数据长度,长度 = 设定长度 - 剩余长度
+                            this_time_rx_len = USART_RX_LEN - hdma_usart3_rx.Instance->NDTR;
+                            //重新设定数据长度
+                            hdma_usart3_rx.Instance->NDTR = USART_RX_LEN;
+                            //设定缓冲区0
+                            hdma_usart3_rx.Instance->CR &= ~(uint32_t)(DMA_SxCR_CT);
+                            //使能DMA
+                            __HAL_DMA_ENABLE(&hdma_usart3_rx);
+                            /*计算缓冲区1*/
+							bsp_bm2166_receive();
+                        }
+                }
+        }
+}

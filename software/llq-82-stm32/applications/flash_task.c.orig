@@ -1,0 +1,62 @@
+#include "flash_task.h"
+#include "bsp_crc16.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "cmsis_os.h"
+
+#include "bsp_flash.h"
+
+
+llq_store llq_store_falsh;
+
+static void flash_task(void const *pvParameters);
+static int user_read_config(void);
+static int user_save_config(void);
+
+static osThreadId FlashTaskHandle;
+void flash_task_creat(void)
+{
+    osThreadDef(flash_task_t,flash_task,osPriorityRealtime,0,128);
+    FlashTaskHandle = osThreadCreate(osThread(flash_task_t), NULL);
+}
+static void flash_task(void const *pvParameters)
+{
+	init_crc16_tab();
+	if(0 == user_read_config())
+	{
+		//读取FLASH成功
+	}
+	else
+	{
+		//读取失败,写入默认参数
+		set_pass_word_def(&llq_store_falsh.bsp_password);
+		user_save_config();
+	}
+	while(1)
+	{
+		osDelay(500);
+	}
+}
+
+static int user_read_config(void)
+{
+	uint16_t crc_check_t = 0;
+	memcpy(&llq_store_falsh,(void*)USER_FALSH_PAGE,sizeof(llq_store));
+	crc_check_t = crc_16(&llq_store_falsh,sizeof(llq_store)-2);
+	if(crc_check_t == llq_store_falsh.crc_check)
+	{
+		//读取成功
+		return 0;
+	}
+	//读取失败
+	return 1;
+}
+static int user_save_config(void)
+{
+	uint16_t crc_check_t = 0;
+	crc_check_t = crc_16(&llq_store_falsh,sizeof(llq_store)-2);
+	llq_store_falsh.crc_check = crc_check_t;
+	cali_flash_erase(USER_FALSH_PAGE,1);
+	cali_flash_write(USER_FALSH_PAGE,&llq_store_falsh,(sizeof(llq_store)+3)/4);
+}

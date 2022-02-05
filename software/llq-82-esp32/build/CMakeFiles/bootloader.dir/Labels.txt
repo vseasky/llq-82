@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+E:/KeyBoard/software/llq-82-esp32/build/CMakeFiles/bootloader
+E:/KeyBoard/software/llq-82-esp32/build/CMakeFiles/bootloader.rule
+E:/KeyBoard/software/llq-82-esp32/build/CMakeFiles/bootloader-complete.rule
+E:/KeyBoard/software/llq-82-esp32/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+E:/KeyBoard/software/llq-82-esp32/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+E:/KeyBoard/software/llq-82-esp32/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+E:/KeyBoard/software/llq-82-esp32/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+E:/KeyBoard/software/llq-82-esp32/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+E:/KeyBoard/software/llq-82-esp32/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+E:/KeyBoard/software/llq-82-esp32/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

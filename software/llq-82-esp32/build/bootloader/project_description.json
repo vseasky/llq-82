@@ -1,0 +1,21 @@
+{
+    "project_name":       "bootloader",
+    "project_path":       "D:/esp32/esp-idf/components/bootloader/subproject",
+    "build_dir":          "E:/KeyBoard/software/llq-82-esp32/build/bootloader",
+    "config_file":        "E:/KeyBoard/software/llq-82-esp32/sdkconfig",
+    "config_defaults":    "",
+    "app_elf":            "bootloader.elf",
+    "app_bin":            "bootloader.bin",
+    "git_revision":       "v4.4-beta1-284-gd83021a6e8",
+    "target":             "esp32s3",
+    "rev":                "",
+    "phy_data_partition": "",
+    "monitor_baud" :      "115200",
+    "monitor_toolprefix": "xtensa-esp32s3-elf-",
+    "config_environment" : {
+        "COMPONENT_KCONFIGS" : "D:/esp32/esp-idf/components/efuse/Kconfig;D:/esp32/esp-idf/components/esp32s3/Kconfig;D:/esp32/esp-idf/components/esp_common/Kconfig;D:/esp32/esp-idf/components/esp_hw_support/Kconfig;D:/esp32/esp-idf/components/esp_system/Kconfig;D:/esp32/esp-idf/components/freertos/Kconfig;D:/esp32/esp-idf/components/hal/Kconfig;D:/esp32/esp-idf/components/log/Kconfig;D:/esp32/esp-idf/components/newlib/Kconfig;D:/esp32/esp-idf/components/spi_flash/Kconfig",
+        "COMPONENT_KCONFIGS_PROJBUILD" : "D:/esp32/esp-idf/components/bootloader/Kconfig.projbuild;D:/esp32/esp-idf/components/esp_rom/Kconfig.projbuild;D:/esp32/esp-idf/components/esptool_py/Kconfig.projbuild;D:/esp32/esp-idf/components/partition_table/Kconfig.projbuild"
+    },
+    "build_components" : [ "bootloader", "bootloader_support", "efuse", "esp32s3", "esp_common", "esp_hw_support", "esp_rom", "esp_system", "esptool_py", "freertos", "hal", "log", "main", "micro-ecc", "newlib", "partition_table", "soc", "spi_flash", "xtensa", "" ],
+    "build_component_paths" : [ "D:/esp32/esp-idf/components/bootloader", "D:/esp32/esp-idf/components/bootloader_support", "D:/esp32/esp-idf/components/efuse", "D:/esp32/esp-idf/components/esp32s3", "D:/esp32/esp-idf/components/esp_common", "D:/esp32/esp-idf/components/esp_hw_support", "D:/esp32/esp-idf/components/esp_rom", "D:/esp32/esp-idf/components/esp_system", "D:/esp32/esp-idf/components/esptool_py", "D:/esp32/esp-idf/components/freertos", "D:/esp32/esp-idf/components/hal", "D:/esp32/esp-idf/components/log", "D:/esp32/esp-idf/components/bootloader/subproject/main", "D:/esp32/esp-idf/components/bootloader/subproject/components/micro-ecc", "D:/esp32/esp-idf/components/newlib", "D:/esp32/esp-idf/components/partition_table", "D:/esp32/esp-idf/components/soc", "D:/esp32/esp-idf/components/spi_flash", "D:/esp32/esp-idf/components/xtensa", "" ]
+}

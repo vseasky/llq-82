@@ -1,0 +1,92 @@
+#include "FreeRTOS.h"
+#include "task.h"
+#include "main.h"
+#include "cmsis_os.h"
+
+#include "lvgl_task.h"
+#include "lvgl.h"
+#include "lv_port_disp.h"
+#include "lvgl_app.h"
+
+
+#include "key_task.h"
+#include "bsp_password.h"
+
+#define LVGL_TICK 50U
+
+
+
+extern enc_key	key_enc_info;
+extern char pass_name_lv[MAX_PASS_NUM*MAX_PASS_NAME_LEN];
+extern lvgl_app_info lvgl_task_app_t;
+void lvgl_main_win(void);
+
+//static void lv_ex_label(void);
+static void lvgl_task(void const *pvParameters);
+static void lvgl_tick_task(void const *pvParameters);
+static void lvgl_user_task(void const *pvParameters);
+
+static osThreadId lvgl_task_handle;
+static osThreadId lvgl_tick_task_handle;
+static osThreadId lvgl_tick_user_handle;
+
+void lvgl_task_creat(void)
+{
+    lv_init();
+    lv_port_disp_init();
+    lvgl_app_init(&lvgl_task_app_t);
+    /*创建线程*/
+    osThreadDef(lvgl_task_t,lvgl_task,osPriorityRealtime,0,2048);
+    lvgl_task_handle = osThreadCreate(osThread(lvgl_task_t), NULL);
+    osThreadDef(lvgl_tick_task_t,lvgl_tick_task,osPriorityRealtime,0,512);
+    lvgl_tick_task_handle = osThreadCreate(osThread(lvgl_tick_task_t), NULL);
+    //用户任务
+			osThreadDef(lvgl_user_task_t,lvgl_user_task,osPriorityRealtime,0,512);
+    lvgl_tick_user_handle = osThreadCreate(osThread(lvgl_user_task_t), NULL);
+}
+
+static void lvgl_user_task(void const *pvParameters)
+{
+    uint8_t key_press_count;
+    TickType_t peroid = osKernelSysTick();
+    lv_roller_set_options(lvgl_task_app_t.widget1.roller_t,
+                          pass_name_lv,
+                          LV_ROLLER_MODE_INFINITE);
+    while(1)
+        {
+            key_press_count = key_enc_info.get_click_state_num(&key_enc_info.key_t[0]);
+            if(key_enc_info.key_t[0].key_info.states == KEY_TASK_PRESS_L_TIME)
+                {
+                    lvgl_task_app_t.gui_key_ctr.cur_key_t = GUI_RETURN_MAIN;
+                }
+            else if(key_press_count == 1)
+                {
+                    lvgl_task_app_t.gui_key_ctr.cur_key_t = GUI_ENTER;
+                }
+            else if(key_press_count == 2)
+                {
+                    lvgl_task_app_t.gui_key_ctr.cur_key_t = GUI_BACK;
+                }
+            lvgl_task_app_t.gui_key_ctr.cur_enc = key_enc_info.encoder_t[0].enc_t;
+            lv_app_run(&lvgl_task_app_t);
+            osDelayUntil(&peroid,25);//任务延时
+        }
+}
+/***************************lvgl***************************/
+static void lvgl_tick_task(void const *pvParameters)
+{
+    while(1)
+        {
+            lv_tick_inc(LVGL_TICK);
+            osDelay(LVGL_TICK);
+        }
+}
+static void lvgl_task(void const *pvParameters)
+{
+    while(1)
+        {
+            lv_timer_handler();
+            osDelay(LVGL_TICK);
+        }
+}
+
