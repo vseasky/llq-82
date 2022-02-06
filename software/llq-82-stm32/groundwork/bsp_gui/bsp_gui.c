@@ -359,7 +359,28 @@ static void interface_finger(uint8_t get_finger, uint8_t fin_mx_task[][MAX_SIZE_
 		lv_set_gui_lable(k - min, &fin_mx_task[k][0], k + 1, (k == get_finger));
 	}
 }
-
+static void interface_finger_select(uint8_t get_finger, uint8_t select, uint8_t fin_mx_task[][MAX_SIZE_LENGTH])
+{
+	//选项滑块
+	uint8_t k;
+	static const uint8_t slider_width = MAX_GUI_SHOW_NUM - 1;
+	static uint8_t min = 0, max = MAX_GUI_SHOW_NUM - 1;
+	//如果移动到最大选项
+	if (get_finger > max)
+	{
+		min = get_finger - slider_width;
+		max = get_finger;
+	}
+	else if (get_finger < min)
+	{
+		min = get_finger;
+		max = get_finger + slider_width;
+	}
+	for (k = min; k <= max; k++)
+	{
+		lv_set_gui_lable_select(k - min, &fin_mx_task[k][0], k + 1, (k == get_finger), (k == select));
+	}
+}
 static void interface_show_only(void)
 {
 	if (mx_oled_info_s.oled_directory >= 3)
@@ -627,6 +648,8 @@ static void interface_task4(void)
 	/***************interface_task4:结束1****************/
 }
 /*gui界面函数5*/
+
+// {".rgb_style1  ", ".rgb_style2  ", ".rgb_style3  ", ".rgb_style4  ", ".rgb_style5  ", ".rgb_style6  ", ".rgb_style7  "};
 static void interface_task5(void)
 {
 
@@ -634,14 +657,19 @@ static void interface_task5(void)
 
 	/***************interface_task2:结束0****************/
 
-	interface_finger(mx_oled_info_s.oled_level2_options[4],
-					 mx_oled_gui_task5);
+	interface_finger_select(mx_oled_info_s.oled_level2_options[4], get_flash_rgb_style(),
+							mx_oled_gui_task5);
 
 	/***************interface_task3:开始1****************/
 	// mx_oled_info_s.oled_directory = 3 自定义为功能界面
-
+	if (mx_oled_info_s.oled_directory >= 3)
+	{
+		set_flash_rgb_style(mx_oled_info_s.oled_level2_options[4]);
+		flash_save_setting();
+		mx_oled_info_s.oled_directory = 2;
+	}
 	//该目录仅用作显示
-	interface_show_only();
+//	interface_show_only();
 
 	/***************interface_task3:结束1****************/
 }
@@ -665,7 +693,7 @@ static void interface_task6(void)
 
 	if (mx_oled_info_s.oled_directory == 3)
 	{
-		curr_options_task6 = (mx_oled_info_s.oled_options_all%100 - last_options_task6+100)%100;
+		curr_options_task6 = (mx_oled_info_s.oled_options_all % 100 - last_options_task6 + 100) % 100;
 		key_setting_show_info(mx_oled_info_s.oled_level2_options[5], curr_options_task6, (mx_oled_info_s.oled_key_button_s == mx_key_right) || (mx_oled_info_s.oled_key_button_s == mx_key_on));
 		if ((mx_oled_info_s.oled_level2_options[5] == 3) && ((mx_oled_info_s.oled_key_button_s == mx_key_right) || (mx_oled_info_s.oled_key_button_s == mx_key_on)))
 		{
@@ -714,4 +742,3 @@ static void ina226_task3(void)
 {
 }
 /***************自定义功能函数******************/
-

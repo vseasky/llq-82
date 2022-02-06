@@ -1,7 +1,7 @@
 /*
  * @author                          : Seasky.Liu
  * @Date                            : 2021-11-22 14:56:38
- * @LastEditTime: 2022-01-29 15:57:17
+ * @LastEditTime: 2022-02-06 14:44:11
  * @LastEditors: Please set LastEditors
  * @Description                     : https://github.com/SEASKY-Master
  * @FilePath                        : \llq-82\groundwork\bsp_touch\bsp_bm2166.c
@@ -497,11 +497,9 @@ void bsp_bm2166_receive(uint8_t *pData, uint16_t rec_len)
 	}
 }
 
-
+uint16_t check_count = 0 ;
 void bm2166_check_err_time(void)
 {
-	static uint8_t check_count = 0 ;
-
 	if(bm2166_touch_info.frame_calc_t.ack_rec_ok != BM_ACK_NO)
 	{
 		check_count++;

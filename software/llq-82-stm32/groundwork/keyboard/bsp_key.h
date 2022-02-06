@@ -31,24 +31,22 @@ extern "C"
 
 #define PRESS_LEVEL 1 //定义按键按下时的电平
 
-#define TIME_ALL_CYCLE 0.6f //扫描一次所有按键消耗时间  单位ms
+#define TIME_ALL_CYCLE 1.2f //扫描一次所有按键消耗时间  单位ms
 
-// 3ms	按键复位3ms
-#define TIME_RESTER_COUNT 5 //定义按键复位时间，一般来说按键弹起最好比按键按下快
-// 6ms	短按触发6ms
-#define TIME_PRESS_COUNT 10 //实际时间 TIME_ALL_CYCLE*TIME_PRESS_COUNT 		(单位ms)确认为短按时间
-// 1s
-#define TIME_PRESS_L_COUNT 1667 //实际时间 TIME_ALL_CYCLE*TIME_PRESS_L_COUNT 	(单位ms)确认为长按时间
-#define TIME_MAX_COUNT 5000     //定义按键最长计数时间
+// 6ms	按键复位3ms
+#define TIME_RESTER_COUNT 	5 //定义按键复位时间，一般来说按键弹起最好比按键按下快
+// 12ms	短按触发12ms
+#define TIME_PRESS_COUNT 	10 //实际时间 TIME_ALL_CYCLE*TIME_PRESS_COUNT 		(单位ms)确认为短按时间
+// 0.75s
+#define TIME_PRESS_L_COUNT  625 	 //实际时间 TIME_ALL_CYCLE*TIME_PRESS_L_COUNT 	(单位ms)确认为长按时间
+#define TIME_MAX_COUNT 		2500     //定义按键最长计数时间
 
-//定义HID报文周期
+//定义HID报文周期，蓝牙HID需要大于等于10，USB可以设为2，此处考虑了兼容，设置为10
 #define TIME_HID_DELAY 10
 
-//长按状态HID更新时间
-#define TIME_PRESS_L_HID_COUNT 3 // HID报文周期为10ms,长按状态30ms发送一个字符
+//长按状态HID更新时间,最小为2
+#define TIME_PRESS_L_HID_COUNT 2 // HID报文周期为10ms,长按状态20ms发送一个字符
 
-//USB离线检测时间
-#define TIME_USB_CONNECT_COUNT 300 // 3s
 
 #define KEY_NO_USER 255
 #define KEY_USER 1

@@ -52,6 +52,7 @@ extern "C"
 		uint8_t lcd_touch_power;
 		uint8_t rgb_power;
 		uint8_t sleep_time;
+		uint8_t rgb_style;
 	} mcu_ctr;
 	//该部分将会被存储到flash中,llq_store，不超过128k
 	typedef struct
@@ -166,6 +167,10 @@ extern "C"
 	void set_tx_current(uint8_t curr_num);
 	void set_tx_default(uint8_t def_num);
 	password_ctr *password_show(void);
+
+	uint8_t get_flash_rgb_style(void);
+
+	void set_flash_rgb_style(uint8_t rgt_style);
 #ifdef __cplusplus
 }
 #endif

@@ -1,7 +1,7 @@
 /*
  * @Author                         : Seasky.Liu
  * @Date                           : Do not edit
- * @LastEditTime: 2022-02-05 14:15:54
+ * @LastEditTime: 2022-02-06 14:48:19
  * @LastEditors: Please set LastEditors
  * @Description                    : https://github.com/SEASKY-Master
  * @FilePath                       : Do not edit
@@ -106,10 +106,12 @@ static void touch_task(void const *pvParameters)
         hand_shake_ask();
         osDelay(100);
         config_led_ask(0xF6, 0X0F, 0x03, 0); //打开灯效,自动灯效
-                                             //	config_led_ask(0xF5, 0XFF, 0x03, 0); //关闭灯效
+                                             //config_led_ask(0xF5, 0XFF, 0x03, 0); //关闭灯效
     }
     while (1)
     {
+		//指纹异常检测，必须放在前面
+        bm2166_check_err_time();
         //串口，只需要不发送就ok
         if (0 != get_touch_power_status())
         {
@@ -123,11 +125,15 @@ static void touch_task(void const *pvParameters)
                     {
                         idle_led_count++;
                     }
-                    if (idle_led_count >= 250)
+					//发送几次扫描图像，恢复查询灯效
+                    if ((idle_led_count >= 250)&&(idle_led_count<285))
                     {
                         get_iamge_ask();
                     }
-                    bm2166_check_err_time();
+					else if(idle_led_count <= 300)
+					{
+						
+					}
                 };
                 break;
                 case TOUCH_GET_NUM:
@@ -192,7 +198,6 @@ static void touch_task(void const *pvParameters)
             }
             else
             {
-                bm2166_check_err_time();
                 hand_shake_ask();
             }
         }
@@ -205,7 +210,6 @@ static void touch_task(void const *pvParameters)
             bm2166_touch_info.press_t = 0;
             bm2166_touch_info.frame_calc_t.ack_rec_ok = BM_ACK_NO;
             bm2166_touch_info.frame_calc_t.ack_ctr_cmd = 0;
-            bm2166_check_err_time();
         }
         touch_auto_send();
         osDelayUntil(&peroid_touch, TOUCH_TASK_TIME); //

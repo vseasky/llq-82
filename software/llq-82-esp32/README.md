@@ -90,6 +90,27 @@
 
 ##### `UART_REPORT_ID_MEDIA`
 
-    媒体发送给PC的数据每次2个字节
+    媒体发送给PC的数据每次2个字节,注意发送一次按下后，要再次发送弹起，清空
         BYTE0 -- key_cmd        ->  媒体按键
         BYTE1 -- key_pressed    ->  是否按下
+
+    ESP32S3媒体支持
+        #define HID_CONSUMER_PLAY           176 // Play			
+        #define HID_CONSUMER_SCAN_NEXT_TRK  181 // Scan Next Track
+        #define HID_CONSUMER_SCAN_PREV_TRK  182 // Scan Previous Track			
+        #define HID_CONSUMER_VOLUME_UP      233 // Volume Increment
+        #define HID_CONSUMER_VOLUME_DOWN    234 // Volume Decrement
+        #define HID_CONSUMER_MUTE           226 // Mute
+        #define HID_CONSUMER_PAUSE          177 // Pause
+        #define HID_CONSUMER_STOP           183 // Stop
+
+        #define HID_CONSUMER_POWER          48  // Power
+        #define HID_CONSUMER_RECALL_LAST    131 // Recall Last
+        #define HID_CONSUMER_ASSIGN_SEL     129 // Assign Selection
+        #define HID_CONSUMER_RECORD         178 // Record
+        #define HID_CONSUMER_FAST_FORWARD   179 // Fast Forward
+        #define HID_CONSUMER_REWIND         180 // Rewind
+        #define HID_CONSUMER_CHANNEL_UP     156 // Channel Increment
+        #define HID_CONSUMER_CHANNEL_DOWN   157 // Channel Decrement
+
+    

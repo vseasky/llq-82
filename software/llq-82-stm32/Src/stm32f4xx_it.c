@@ -82,8 +82,8 @@ extern UART_HandleTypeDef huart3;
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
- * @brief This function handles Non maskable interrupt.
- */
+  * @brief This function handles Non maskable interrupt.
+  */
 void NMI_Handler(void)
 {
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
@@ -95,8 +95,8 @@ void NMI_Handler(void)
 }
 
 /**
- * @brief This function handles Hard fault interrupt.
- */
+  * @brief This function handles Hard fault interrupt.
+  */
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
@@ -110,12 +110,12 @@ void HardFault_Handler(void)
 }
 
 /**
- * @brief This function handles Memory management fault.
- */
+  * @brief This function handles Memory management fault.
+  */
 void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
-  // NVIC_SystemReset();
+  NVIC_SystemReset();
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
   {
@@ -125,12 +125,12 @@ void MemManage_Handler(void)
 }
 
 /**
- * @brief This function handles Pre-fetch fault, memory access fault.
- */
+  * @brief This function handles Pre-fetch fault, memory access fault.
+  */
 void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
-  // NVIC_SystemReset();
+  NVIC_SystemReset();
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
   {
@@ -140,12 +140,12 @@ void BusFault_Handler(void)
 }
 
 /**
- * @brief This function handles Undefined instruction or illegal state.
- */
+  * @brief This function handles Undefined instruction or illegal state.
+  */
 void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */
-  // NVIC_SystemReset();
+  NVIC_SystemReset();
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
   {
@@ -155,8 +155,8 @@ void UsageFault_Handler(void)
 }
 
 /**
- * @brief This function handles Debug monitor.
- */
+  * @brief This function handles Debug monitor.
+  */
 void DebugMon_Handler(void)
 {
   /* USER CODE BEGIN DebugMonitor_IRQn 0 */
@@ -168,20 +168,20 @@ void DebugMon_Handler(void)
 }
 
 /**
- * @brief This function handles System tick timer.
- */
+  * @brief This function handles System tick timer.
+  */
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
-#if (INCLUDE_xTaskGetSchedulerState == 1)
+#if (INCLUDE_xTaskGetSchedulerState == 1 )
   if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
   {
 #endif /* INCLUDE_xTaskGetSchedulerState */
-    xPortSysTickHandler();
-#if (INCLUDE_xTaskGetSchedulerState == 1)
+  xPortSysTickHandler();
+#if (INCLUDE_xTaskGetSchedulerState == 1 )
   }
 #endif /* INCLUDE_xTaskGetSchedulerState */
   /* USER CODE BEGIN SysTick_IRQn 1 */
@@ -197,8 +197,8 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
- * @brief This function handles EXTI line3 interrupt.
- */
+  * @brief This function handles EXTI line3 interrupt.
+  */
 void EXTI3_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI3_IRQn 0 */
@@ -211,8 +211,8 @@ void EXTI3_IRQHandler(void)
 }
 
 /**
- * @brief This function handles DMA1 stream1 global interrupt.
- */
+  * @brief This function handles DMA1 stream1 global interrupt.
+  */
 void DMA1_Stream1_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream1_IRQn 0 */
@@ -225,8 +225,8 @@ void DMA1_Stream1_IRQHandler(void)
 }
 
 /**
- * @brief This function handles DMA1 stream3 global interrupt.
- */
+  * @brief This function handles DMA1 stream3 global interrupt.
+  */
 void DMA1_Stream3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream3_IRQn 0 */
@@ -239,8 +239,8 @@ void DMA1_Stream3_IRQHandler(void)
 }
 
 /**
- * @brief This function handles EXTI line[9:5] interrupts.
- */
+  * @brief This function handles EXTI line[9:5] interrupts.
+  */
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
@@ -253,8 +253,8 @@ void EXTI9_5_IRQHandler(void)
 }
 
 /**
- * @brief This function handles TIM1 update interrupt and TIM10 global interrupt.
- */
+  * @brief This function handles TIM1 update interrupt and TIM10 global interrupt.
+  */
 void TIM1_UP_TIM10_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
@@ -275,8 +275,8 @@ void TIM1_UP_TIM10_IRQHandler(void)
 }
 
 /**
- * @brief This function handles TIM4 global interrupt.
- */
+  * @brief This function handles TIM4 global interrupt.
+  */
 void TIM4_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM4_IRQn 0 */
@@ -297,8 +297,8 @@ void TIM4_IRQHandler(void)
 }
 
 /**
- * @brief This function handles USART1 global interrupt.
- */
+  * @brief This function handles USART1 global interrupt.
+  */
 void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
@@ -311,8 +311,8 @@ void USART1_IRQHandler(void)
 }
 
 /**
- * @brief This function handles USART3 global interrupt.
- */
+  * @brief This function handles USART3 global interrupt.
+  */
 void USART3_IRQHandler(void)
 {
   /* USER CODE BEGIN USART3_IRQn 0 */
@@ -326,8 +326,8 @@ void USART3_IRQHandler(void)
 }
 
 /**
- * @brief This function handles DMA2 stream2 global interrupt.
- */
+  * @brief This function handles DMA2 stream2 global interrupt.
+  */
 void DMA2_Stream2_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream2_IRQn 0 */
@@ -340,8 +340,8 @@ void DMA2_Stream2_IRQHandler(void)
 }
 
 /**
- * @brief This function handles DMA2 stream3 global interrupt.
- */
+  * @brief This function handles DMA2 stream3 global interrupt.
+  */
 void DMA2_Stream3_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream3_IRQn 0 */
@@ -354,8 +354,8 @@ void DMA2_Stream3_IRQHandler(void)
 }
 
 /**
- * @brief This function handles USB On The Go FS global interrupt.
- */
+  * @brief This function handles USB On The Go FS global interrupt.
+  */
 void OTG_FS_IRQHandler(void)
 {
   /* USER CODE BEGIN OTG_FS_IRQn 0 */
@@ -368,8 +368,8 @@ void OTG_FS_IRQHandler(void)
 }
 
 /**
- * @brief This function handles DMA2 stream7 global interrupt.
- */
+  * @brief This function handles DMA2 stream7 global interrupt.
+  */
 void DMA2_Stream7_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA2_Stream7_IRQn 0 */

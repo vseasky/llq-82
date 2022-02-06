@@ -7,8 +7,8 @@ HeaderPath=..\Drivers\STM32F4xx_HAL_Driver\Inc;..\Drivers\STM32F4xx_HAL_Driver\I
 CDefines=USE_HAL_DRIVER;STM32F405xx;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousGenFiles]
-HeaderPath=E:/KeyBoard/software/llq-82/Inc
+HeaderPath=E:/github/LLQ-82-Keyboard/LLQ-82/software/llq-82-stm32/Inc
 HeaderFiles=gpio.h;FreeRTOSConfig.h;adc.h;dma.h;i2c.h;spi.h;tim.h;usart.h;usb_device.h;usbd_conf.h;usbd_desc.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;
-SourcePath=E:/KeyBoard/software/llq-82/Src
+SourcePath=E:/github/LLQ-82-Keyboard/LLQ-82/software/llq-82-stm32/Src
 SourceFiles=gpio.c;freertos.c;adc.c;dma.c;i2c.c;spi.c;tim.c;usart.c;usb_device.c;usbd_conf.c;usbd_desc.c;stm32f4xx_it.c;stm32f4xx_hal_msp.c;main.c;
 

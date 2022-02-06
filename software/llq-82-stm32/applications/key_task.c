@@ -171,7 +171,7 @@ void key_app_fun(void)
         media_mute();
     }
     break;
-    case 5: //
+    case 5: //停止
     {
         media_stop();
     }
@@ -181,7 +181,7 @@ void key_app_fun(void)
     }
     if (key_enc[1] != last_key_enc[1])
     {
-        if (key_enc_dir[1])
+        if (!key_enc_dir[1])
         {
             media_volume_increment();
         }
@@ -224,6 +224,14 @@ void key_scan_task(void const *pvParameters)
     }
 }
 
+
+/**
+ * @Author                         : Seasky.Liu
+ * @Date                           : Do not edit
+ * @description                    : 待机唤醒使用
+ * @param                           {*}
+ * @return                          {*}
+ */
 void key_scanf_for_standby(void)
 {
     static uint16_t standby_timer = 0;
@@ -232,6 +240,8 @@ void key_scanf_for_standby(void)
     //初始化编码器按键扫描
     key_enc_init();
     standby_timer = 0;
+    key_enc_info.get_click_state_num(&key_enc_info.key_t[0]);
+    key_enc_info.get_click_state_num(&key_enc_info.key_t[1]);
     while (1)
     {
         key_enc_scanf();
@@ -243,13 +253,21 @@ void key_scanf_for_standby(void)
         {
             flash_config_exit_standy();
         }
+        else if (check_standby_normal())
+        {
+            break;
+        }
+        else if((key_count[0]!=0)||(key_count[0]!=0))
+        {
+            sys_enter_stop();
+        }
         if (check_standby_normal())
         {
             break;
         }
         else if (standby_timer > 1000)
         {
-            //如果是待机模式，重新待机
+            //如果是待机模式，超过时间未连续按按键，重新待机
             sys_enter_stop();
         }
         standby_timer++;

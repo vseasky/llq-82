@@ -1,7 +1,7 @@
 /*** 
  * @author                          : Seasky.Liu
  * @Date                            : 2021-11-22 14:56:38
- * @LastEditTime: 2022-01-29 15:56:58
+ * @LastEditTime: 2022-02-06 14:43:57
  * @LastEditors: Please set LastEditors
  * @Description                     : https://github.com/SEASKY-Master
  * @FilePath                        : \keyboard_v6\groundwork\bsp_touch\bsp_bm2166.h
@@ -51,7 +51,7 @@ extern "C" {
 #define BM_ACK_NO  			 0
 #define BM_ACK_WAIT 	     1
 #define BM_ACK_OK   		 2
-#define BM_ACK_MAX_WAIT_TIME 20
+#define BM_ACK_MAX_WAIT_TIME 300
 
 
 #define TOUCH_MAX_RUN_COUNT 	10 

@@ -135,6 +135,7 @@ extern "C"
 	void lvgl_app_init(lvgl_app_info *lvgl_app_t);
 	void lv_app_run(lvgl_app_info *lvgl_app_t);
 	void lv_set_gui_lable(uint8_t num, char *str, uint8_t id, uint8_t enable);
+	void lv_set_gui_lable_select(uint8_t num, char *str, uint8_t id, uint8_t enable,uint8_t select);
 	void lv_set_gui_setting(uint8_t num, char *str, uint8_t id, uint8_t enable);
 	void lv_set_gui_input(uint8_t num, char *str, uint8_t id, uint8_t enable);
 	void lv_set_bel_wifi(uint8_t ble_t, uint8_t wifi_t, uint8_t usb_t);

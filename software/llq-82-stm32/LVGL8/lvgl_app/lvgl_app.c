@@ -1,7 +1,7 @@
 /*
  * @author                          : Seasky.Liu
  * @Date                            : 2021-11-22 14:56:40
- * @LastEditTime: 2022-02-04 17:40:28
+ * @LastEditTime: 2022-02-06 20:36:10
  * @LastEditors: Please set LastEditors
  * @Description                     : https://github.com/SEASKY-Master
  * @FilePath                        : \llq-82\LVGL8\lvgl_app\lvgl_app.c
@@ -183,7 +183,26 @@ void lv_set_gui_lable(uint8_t num, char *str, uint8_t id, uint8_t enable)
         }
     }
 }
-
+void lv_set_gui_lable_select(uint8_t num, char *str, uint8_t id, uint8_t enable, uint8_t select)
+{
+    char curr_style[16] = {0};
+    if (num < LVGL_MAX_LABLE)
+    {
+        memset(curr_style, 0, sizeof(curr_style));
+        if (select != 0)
+        {
+            snprintf(curr_style, 16, "# #FF0000 %s", LV_SYMBOL_OK);
+        }
+        if (enable != 0)
+        {
+            lv_label_set_text_fmt(lvgl_task_app_t.widget1.lable[num], "%s %4s %d %s %s", lvgl_task_app_t.llq_style.font_select_color, LV_SYMBOL_RIGHT, id, str,curr_style);
+        }
+        else
+        {
+            lv_label_set_text_fmt(lvgl_task_app_t.widget1.lable[num], "%s %4s %d %s %s", lvgl_task_app_t.llq_style.font_normal_color, "   ", id, str,curr_style);
+        }
+    }
+}
 void lv_set_gui_setting(uint8_t num, char *str, uint8_t id, uint8_t enable)
 {
     if (num == 0)
@@ -259,7 +278,7 @@ void lv_main_lable_updata(void)
     {
         strcat(lable_str, LV_SYMBOL_BLUETOOTH);
     }
-    else if(lvgl_task_app_t.main_win.lable_status.usb_status)
+    else if (lvgl_task_app_t.main_win.lable_status.usb_status)
     {
         strcat(lable_str, LV_SYMBOL_USB);
     }

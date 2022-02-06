@@ -1,6 +1,6 @@
 /*
  * @author                          : Seasky.Liu
- * @LastEditTime: 2022-02-05 16:37:00
+ * @LastEditTime: 2022-02-06 15:36:16
  * @LastEditors: Please set LastEditors
  * @Description                     : https://github.com/SEASKY-Master
  * @FilePath                        : \llq-82\applications\keyboard_task.c
@@ -96,7 +96,6 @@ void keyboard_buffer_show(uint8_t options, uint8_t check)
     lv_set_gui_input(4, password_len, options, check);
     key_info.keyboard_user = check;
 }
-
 static void HID_SendMouse(uint8_t *report, uint16_t len)
 {
     report[0] = 0x01;
@@ -109,6 +108,7 @@ static void HID_SendMouse(uint8_t *report, uint16_t len)
     break;
     case LLQ_BLE_HID:
     {
+        // report[0] = UART_REPORT_ID_MOUSE;
         if (0 != get_ble_power_status())
         {
             ble_tx_buff_updata(report, len);
@@ -133,6 +133,7 @@ static void HID_SendKeyBoard(uint8_t *report, uint16_t len)
     break;
     case LLQ_BLE_HID:
     {
+        // report[0] = UART_REPORT_ID_KEY;
         if (0 != get_ble_power_status())
         {
             ble_tx_buff_updata(report, len);
@@ -144,6 +145,47 @@ static void HID_SendKeyBoard(uint8_t *report, uint16_t len)
     }
 }
 
+static uint8_t USB_Convert_BLE_Media(void)
+{
+    uint8_t msg_media = 0;
+    if (key_info.keyboard.media_off.key_play == 1)
+    {
+        msg_media = HID_CONSUMER_PLAY;
+    }
+    else if (key_info.keyboard.media_off.key_next_track == 1)
+    {
+        msg_media = HID_CONSUMER_SCAN_NEXT_TRK;
+    }
+    else if (key_info.keyboard.media_off.key_previous_track == 1)
+    {
+        msg_media = HID_CONSUMER_SCAN_PREV_TRK;
+    }
+    else if (key_info.keyboard.media_off.key_volume_increment == 1)
+    {
+        msg_media = HID_CONSUMER_VOLUME_UP;
+    }
+    else if (key_info.keyboard.media_off.key_volume_decrement == 1)
+    {
+        msg_media = HID_CONSUMER_VOLUME_DOWN;
+    }
+    else if (key_info.keyboard.media_off.key_mute == 1)
+    {
+        msg_media = HID_CONSUMER_MUTE;
+    }
+    else if (key_info.keyboard.media_off.key_pause == 1)
+    {
+        msg_media = HID_CONSUMER_PAUSE;
+    }
+    else if (key_info.keyboard.media_off.key_stop == 1)
+    {
+        msg_media = HID_CONSUMER_STOP;
+    }
+    else
+    {
+        msg_media = 0;
+    }
+    return msg_media;
+}
 static void HID_SendMedia(uint8_t *report, uint16_t len)
 {
     report[0] = 0x03;
@@ -159,6 +201,15 @@ static void HID_SendMedia(uint8_t *report, uint16_t len)
         //可能需要转换
         if (0 != get_ble_power_status())
         {
+            report[1] = USB_Convert_BLE_Media();
+            if (report[1] != 0)
+            {
+                report[2] = 1;
+            }
+            else
+            {
+                report[2] = 0;
+            }
             ble_tx_buff_updata(report, len);
         }
     }
@@ -215,11 +266,11 @@ static void keyboard_hid_info_updata(void)
     }
     break;
     case LLQ_WORK_MEDIA:
-    {        
+    {
         key_tx_buffer[1] = media_updata(&key_info);
         HID_SendMedia(key_tx_buffer, 4); //发送报文
-		if (key_info.keyboard.media_off.media_msg == 0)
-		{
+        if (key_info.keyboard.media_off.media_msg == 0)
+        {
             keyboard_work_reset(&key_info);
         }
         if (key_info.keyboard.media_off.media_msg != 0)
@@ -233,8 +284,6 @@ static void keyboard_hid_info_updata(void)
             key_info.keyboard.media_off.key_pause = 0;
             key_info.keyboard.media_off.key_stop = 0;
         }
-     
-
     };
     break;
     case LLQ_WORK_STRING:
@@ -292,7 +341,7 @@ static void keyboard_task(void const *pvParameters)
 
 /**
  * @Author                         : Seasky.Liu
- * @description                    : 75us 进入一次 600us完成一次全键盘扫描，按键扫描
+ * @description                    : 150us 进入一次 1200us完成一次全键盘扫描，按键扫描
  * @param                           {*}
  * @return                          {*}
  */

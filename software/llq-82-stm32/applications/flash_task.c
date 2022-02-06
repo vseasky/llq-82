@@ -1,7 +1,7 @@
 /*
  * @Author                         : Seasky.Liu
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2022-02-05 15:34:26
+ * @LastEditTime: 2022-02-06 20:43:29
  * @FilePath                        : \llq-82\applications\flash_task.c
  * @Description                    : https://github.com/SEASKY-Master
  * @版权所有: @Seasky.Liu
@@ -37,12 +37,33 @@ static osThreadId FlashTaskHandle;
  */
 void flash_info_init(void)
 {
+    static uint8_t read_flash_count = 0;
+    static uint8_t read_flash_it = 0;
     memset(&falsh_store_ctr, 0, sizeof(llq_store_ctr));
     init_crc16_tab();
     falsh_store_ctr.flash_status = FLASH_NO_INIT;
     falsh_store_ctr.flash_cmd = FLASH_CMD_NO;
     falsh_store_ctr.flash_cmd = FLASH_CMD_READ;
-    if (0 == user_read_config())
+
+    read_flash_it = 1;
+    read_flash_count = 0;
+    //最多尝试5次读取，五次读取失败，认为flash异常，需要重新写入
+    while(read_flash_count<5)
+    {
+        read_flash_count++;
+        if (0 == user_read_config())
+        {
+            //读取FLASH成功
+            falsh_store_ctr.flash_cmd = FLASH_CMD_READ_OK;
+            read_flash_it = 0;
+            break;
+        }
+        else
+        {
+            read_flash_it = 1;
+        }
+    }
+    if (0 == read_flash_it)
     {
         //读取FLASH成功
         falsh_store_ctr.flash_cmd = FLASH_CMD_READ_OK;
@@ -60,6 +81,7 @@ void flash_info_init(void)
         falsh_store_ctr.llq_store_p.llq_mcu_ctr.right_dir = 0;
         falsh_store_ctr.llq_store_p.llq_mcu_ctr.lcd_touch_power = 0;
         falsh_store_ctr.llq_store_p.llq_mcu_ctr.rgb_power = 0;
+        falsh_store_ctr.llq_store_p.llq_mcu_ctr.rgb_style = 0;
         if (0 == user_save_config())
         {
             falsh_store_ctr.flash_cmd = FLASH_CMD_WRITE_OK;
@@ -131,11 +153,11 @@ static void flash_task(void const *pvParameters)
                 if (!check_standby_normal())
                 {
                     flash_save_setting();
+                    enter_standby_time++;
                     if (enter_standby_time >= 2)
                     {
                         sys_enter_stop();
                     }
-                    enter_standby_time++;
                 }
                 else
                 {
@@ -569,4 +591,14 @@ void key_setting_show_info(uint8_t level, uint8_t enc_t, uint8_t enable)
     }
     break;
     }
+}
+
+uint8_t get_flash_rgb_style(void)
+{
+    return falsh_store_ctr.llq_store_p.llq_mcu_ctr.rgb_style;
+}
+
+void set_flash_rgb_style(uint8_t rgt_style)
+{
+    falsh_store_ctr.llq_store_p.llq_mcu_ctr.rgb_style = rgt_style;
 }
