@@ -23,7 +23,7 @@ oled_gui mx_oled_info_s = {0};
 /*						GUI字符列表 							*/
 //根据需要添加相关显示函数
 uint8_t mx_oled_gui_str[MAX_GUI_LEVEL1][MAX_SIZE_LENGTH] =
-	{".password  ", ".touch  ", ".power     ", ".lvgl_style    ", ".rgb_style    ", ".setting    ", ".keyboadr type"};
+	{".password  ", ".touch  ", ".power     ", ".lvgl_style    ", ".rgb_style    ", ".setting    ", ".keyboard type"};
 
 // uint8_t mx_oled_gui_task1[MAX_TASK1_NUM][MAX_SIZE_LENGTH];
 

@@ -221,6 +221,7 @@ static void HID_SendMedia(uint8_t *report, uint16_t len)
 static void usb_connect_check(void)
 {
     uint8_t usb_err_hid_status = 0;
+	static  uint8_t ble_reset_count = 0;
     usb_err_hid_status = USBD_HID_Check_Connect(&hUsbDeviceFS);
     if (usb_err_hid_status)
     {
@@ -228,12 +229,25 @@ static void usb_connect_check(void)
         keyboard_mode_check(&key_info, 1, 0);
         power_ble_close_fun();
         ble_clear_connect();
+		ble_reset_count = 0;
     }
     else
     {
         //无线键盘模式
         keyboard_mode_check(&key_info, 0, ble_check_connect());
-        if (get_ble_power_status() == 0)
+		if(ble_reset_count<5)
+		{
+			if(ble_reset_count%2)
+			{
+				power_ble_open_fun();
+			}
+			else
+			{
+				power_ble_close_fun();
+			}
+			ble_reset_count++;
+		}
+		else if (get_ble_power_status() == 0)
         {
             power_ble_open_fun();
         }

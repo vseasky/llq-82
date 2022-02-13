@@ -1,7 +1,7 @@
 /*
  * @Author                         : Seasky.Liu
  * @LastEditors: Please set LastEditors
- * @LastEditTime: 2022-02-06 20:43:29
+ * @LastEditTime: 2022-02-12 22:10:41
  * @FilePath                        : \llq-82\applications\flash_task.c
  * @Description                    : https://github.com/SEASKY-Master
  * @∞Ê»®À˘”–: @Seasky.Liu
@@ -79,6 +79,8 @@ void flash_info_init(void)
         falsh_store_ctr.llq_store_p.llq_mcu_ctr.sleep_time = NORMAL_LCD_SHOW_TIME;
         falsh_store_ctr.llq_store_p.llq_mcu_ctr.left_dir = 0;
         falsh_store_ctr.llq_store_p.llq_mcu_ctr.right_dir = 0;
+		falsh_store_ctr.llq_store_p.bsp_password.pass_word_point = 0;
+		falsh_store_ctr.llq_store_p.bsp_password.pass_word_default_point = 0;
         falsh_store_ctr.llq_store_p.llq_mcu_ctr.lcd_touch_power = 0;
         falsh_store_ctr.llq_store_p.llq_mcu_ctr.rgb_power = 0;
         falsh_store_ctr.llq_store_p.llq_mcu_ctr.rgb_style = 0;
@@ -595,7 +597,12 @@ void key_setting_show_info(uint8_t level, uint8_t enc_t, uint8_t enable)
 
 uint8_t get_flash_rgb_style(void)
 {
-    return falsh_store_ctr.llq_store_p.llq_mcu_ctr.rgb_style;
+    static uint8_t last_style = 0;
+    if(falsh_store_ctr.flash_cmd == FLASH_CMD_NO)
+    {
+        last_style = falsh_store_ctr.llq_store_p.llq_mcu_ctr.rgb_style;
+    }
+    return last_style;
 }
 
 void set_flash_rgb_style(uint8_t rgt_style)

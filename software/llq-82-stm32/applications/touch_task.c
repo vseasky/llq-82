@@ -101,13 +101,14 @@ static void touch_task(void const *pvParameters)
     bm2166_touch_info.press_t = 0;
     bm2166_touch_info.frame_calc_t.ack_ctr_cmd = 0;
     bm2166_touch_info.frame_calc_t.ack_rec_ok = BM_ACK_NO;
-    if (0 != get_touch_power_status())
-    {
-        hand_shake_ask();
-        osDelay(100);
-        config_led_ask(0xF6, 0X0F, 0x03, 0); //打开灯效,自动灯效
-                                             //config_led_ask(0xF5, 0XFF, 0x03, 0); //关闭灯效
-    }
+//    if (0 != get_touch_power_status())
+//    {
+//        hand_shake_ask();
+//        osDelay(100);
+////        config_led_ask(0xF6, 0X0F, 0x03, 0); //打开灯效,自动灯效
+//        config_led_ask(0xF5, 0XFF, 0x03, 0); //关闭灯效
+//			osDelay(100);
+//    }
     while (1)
     {
 		//指纹异常检测，必须放在前面
