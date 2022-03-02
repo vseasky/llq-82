@@ -1,0 +1,94 @@
+#include "touch_tack.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "cmsis_os.h"
+
+#include "bsp_bm2166.h"
+
+
+extern bm2166_touch bm2166_touch_info;
+
+static void touch_task(void const *pvParameters);
+
+static osThreadId Touch_TaskHandle;
+void touch_task_creat(void)
+{
+	osThreadDef(rgbled_task,touch_task,osPriorityRealtime,0,128);
+    Touch_TaskHandle = osThreadCreate(osThread(rgbled_task), NULL);
+}
+
+
+static void touch_task(void const *pvParameters)
+{
+	bm2166_init();
+	bm2166_touch_info.hand_shake_s = 1;
+	bm2166_touch_info.get_image_t = 0xff;
+	bm2166_touch_info.genchar_t = 0xff;
+	bm2166_touch_info.high_search_t.high_search_s =0xff;
+	hand_shake_ask();
+	osDelay(100);
+	validtemp_num_ask();
+	while(1)
+	{
+			//如果握手失败，继续发送握手信号，成功则进入正常指纹逻辑业务
+		if(bm2166_touch_info.hand_shake_s == 0)
+		{
+			if(press_long==2)
+			{
+				get_iamge_ask();
+			}
+	
+				if(bm2166_touch_info.get_image_t!=0)
+				{
+					press_long = 1;//表示未按下
+					get_iamge_ask();
+				}
+				else if(press_long == 1)
+				{
+					if(bm2166_touch_info.genchar_t !=0 )
+					{
+						genchar_ask(CharBuffer1);
+					}
+					else
+					{
+						if(bm2166_touch_info.high_search_t.high_search_s == 0xff)
+						{
+							high_speed_search_ask(CharBuffer1,0,300);
+						}
+						else if(bm2166_touch_info.high_search_t.high_search_s ==0 )
+						{
+							//比对成功
+							if(bm2166_touch_info.high_search_t.page_id<=5)
+							{
+								pass_id[bm2166_touch_info.high_search_t.page_id][0]++;
+								pass_id[bm2166_touch_info.high_search_t.page_id][1] = 
+										bm2166_touch_info.high_search_t.mathscore;
+							}
+							bm2166_touch_info.genchar_t = 0xff;			
+							bm2166_touch_info.high_search_t.high_search_s =0xff;
+							bm2166_touch_info.high_search_t.page_id = 0;
+							bm2166_touch_info.high_search_t.mathscore = 0;
+							press_long = 2;
+						}
+						else 
+						{
+							bm2166_touch_info.genchar_t = 0xff;
+							bm2166_touch_info.high_search_t.high_search_s =0xff;
+							bm2166_touch_info.high_search_t.page_id = 0;
+							bm2166_touch_info.high_search_t.mathscore = 0;
+							press_long = 2;
+						}
+					}
+				}
+			
+			osDelay(100);
+		}
+		else
+		{
+			hand_shake_ask();
+			osDelay(100);
+		}
+	
+	}
+}

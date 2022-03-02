@@ -1,0 +1,36 @@
+{
+    "files.associations": {
+        "bsp_ws2812b.h": "c",
+        "ws2812b_task.h": "c",
+        "struct_typedef.h": "c",
+        "touch_tack.h": "c",
+        "bsp_bm2166.h": "c",
+        "lcd_init.h": "c",
+        "main.h": "c",
+        "bsp_interface.h": "c",
+        "key_task.h": "c",
+        "flash_task.h": "c",
+        "lvgl_app.h": "c",
+        "bsp_gui.h": "c",
+        "bsp_password.h": "c",
+        "keyboard_task.h": "c",
+        "bsp_key.h": "c",
+        "touch_task.h": "c",
+        "power_task.h": "c",
+        "bsp_sw6208.h": "c",
+        "bit": "c",
+        "compare": "c",
+        "cstddef": "c",
+        "limits": "c",
+        "type_traits": "c",
+        "vector": "c",
+        "xutility": "c",
+        "keyboard_cfg.h": "c",
+        "bsp_ble.h": "c"
+    },
+    "files.autoGuessEncoding": true,
+    "files.encoding": "gbk",
+    "files.exclude": {
+        "**/*.orig": true
+    }
+}

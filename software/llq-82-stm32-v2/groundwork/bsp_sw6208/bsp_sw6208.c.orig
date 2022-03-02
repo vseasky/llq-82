@@ -1,0 +1,115 @@
+/*
+ * @author                          : Seasky.Liu
+ * @Date                            : 2021-11-24 10:02:48
+ * @LastEditTime                    : 2022-01-04 16:31
+ * @LastEditors                     : your name
+ * @Description                     : https://github.com/SEASKY-Master
+ * @FilePath                        : \keyboard_v6\groundwork\bsp_sw6208\bsp_sw6208.c
+ * @symbol_custom_string_obkoro1    :
+ * 版权所有:@Seasky.liu
+ * 联系方式:liuwei_seasky@163.com
+ * 开源协议:请遵从开源协议（项目仓库中有说明），未经作者允许、严禁用于商业用途
+ * ************************************************************************
+ *            If you want a thing done well, do it yourself.
+ * ************************************************************************
+ */
+#include "bsp_sw6208.h"
+#include "i2c.h"
+#include "bsp_delay.h"
+
+bsp_sw6208_info bsp_sw6208_addr;
+//发送,写入数据
+void SW6208_SendData(uint8_t addr, uint8_t reg, uint8_t data)
+{
+    uint8_t temp[2] = {0};
+    temp[0] = data;
+    HAL_I2C_Mem_Write(&hi2c3,
+                      addr,
+                      reg,
+                      I2C_MEMADD_SIZE_8BIT,
+                      temp, 1, 0xff);
+}
+
+//设置寄存器指针
+void SW6208_SetRegPointer(uint8_t addr, uint8_t reg)
+{
+    HAL_I2C_Master_Transmit(&hi2c3,
+                            addr,
+                            &reg,
+                            1,
+                            0xff);
+}
+
+//读取数据
+uint8_t SW6208_ReadData(uint8_t addr)
+{
+    uint8_t temp[2] = {0};
+    HAL_I2C_Master_Receive(&hi2c3, addr + 1, temp, 1, 0xff);
+    return temp[0];
+}
+
+//获取id
+void SW6208_Get_ID(uint8_t addr)
+{
+    uint32_t temp = 0;
+    SW6208_SetRegPointer(addr, 0XB0);
+    temp = SW6208_ReadData(addr);
+}
+
+/**
+ * @Author: Seasky.Liu
+ * @Description: 初始化PD充电配置
+ * @param {*}
+ * @return {*}
+ */
+void bsp_sw6208_init(void)
+{
+    //不使用按键
+    SW6208_SendData(SW6208_ADDR, SW6208_BUTTON_CFG1_REG, 0X00);
+    SW6208_SendData(SW6208_ADDR, SW6208_BUTTON_CFG2_REG, 0X00);
+    //ADC配置
+    SW6208_SendData(SW6208_ADDR, SW6208_ADC_CFG_REG, 0X00);//选择ADC电压为电池电压
+    //输入输出使能控制
+    // SW6208_SendData(SW6208_ADDR, SW6208_EN_CHARGE_REG, 0X00);
+    //快充配置
+    SW6208_SendData(SW6208_ADDR, SW6208_FAST_CFG0_REG, 0X83);//不检测DM、不支持12V、最高9V
+    SW6208_SendData(SW6208_ADDR, SW6208_FAST_CFG1_REG, 0XF7);//C口输入使能，其余禁用
+    SW6208_SendData(SW6208_ADDR, SW6208_FAST_CFG4_REG, 0X02); //支持边充边放，不支持QC SOURCE
+
+    //PD配置
+    SW6208_SendData(SW6208_ADDR, SW6208_PD_CFG0_REG, 0X10);//PD3.0 最高9V
+    SW6208_SendData(SW6208_ADDR, SW6208_PD_CFG2_REG, 0X00);//5V3A,9V/2A,12V/1.5A
+
+    //BOOST 配置
+    SW6208_SendData(SW6208_ADDR, SW6208_BOOST_CFG0_REG, 0X00);
+    SW6208_SendData(SW6208_ADDR, SW6208_BOOST_CFG1_REG, 0X00);
+
+    //Charger 配置
+    SW6208_SendData(SW6208_ADDR, SW6208_CHARGER_CFG0_REG, 0X04);//500k 18W
+    SW6208_SendData(SW6208_ADDR, SW6208_CHARGER_CFG4_REG, 0X60);//500K
+
+    //电池容量
+    //SW6208_SendData(SW6208_ADDR, SW6208_BAT_CAP0_REG, 0X04);//
+    //SW6208_SendData(SW6208_ADDR, SW6208_BAT_CAP1_REG, 0X60);//
+
+    SW6208_SetRegPointer(SW6208_ADDR, SW6208_CHIP_VER_REG);
+    bsp_sw6208_addr.chip_ver =  SW6208_ReadData(SW6208_ADDR);
+}
+void bsp_sw6209_get_info(void)
+{
+    uint8_t temp_test[2];
+
+
+    //读取ADC电压
+    SW6208_SetRegPointer(SW6208_ADDR, SW6208_ADC_HIGH_REG);
+    temp_test[0] = SW6208_ReadData(SW6208_ADDR);
+    SW6208_SetRegPointer(SW6208_ADDR, SW6208_ADC_LOW_REG);
+    temp_test[1] = SW6208_ReadData(SW6208_ADDR);
+    bsp_sw6208_addr.battery_volt = SW6208_ADC_VOLTAGE*((temp_test[0]<<4)|((temp_test[1])&0x0F));
+    //读取电池电量
+    SW6208_SetRegPointer(SW6208_ADDR, SW6208_PROCE_POWER_REG);
+    bsp_sw6208_addr.battery_cap = SW6208_ReadData(SW6208_ADDR);
+
+    
+
+}
